@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aksara</title>
+</head>
+<body>
+    <header>
+        <nav aria-label="Navigasi utama">
+            <h1>Aksara</h1>
+            <ul>
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="login.html" aria-current="page">Masuk</a></li>
+                <li><a href="courses.html">Kursus</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="login">
+            <h2>Masuk ke Aksara</h2>
+            <p>Silakan masuk menggunakan akun Anda untuk mengakses seluruh fitur Aksara.</p>
+
+            <form action="dashboard.html" method="get">
+                <fieldset>
+                    <legend>Informasi Akun</legend>
+
+                    <div>
+                        <label for="email">Email atau Username</label>
+                        <input type="text" id="email" name="email" placeholder="Masukkan email atau username Anda" required>
+                    </div>
+
+                    <div>
+                        <label for="password">Kata Sandi</label>
+                        <input type="password" id="password" name="password" placeholder="Masukkan kata sandi Anda" required>
+                    </div>
+
+                    <div>
+                        <label for="role">Masuk Sebagai</label>
+                        <select id="role" name="role" required>
+                            <option value="" disabled selected>Pilih peran Anda</option>
+                            <option value="pelajar">Pelajar</option>
+                            <option value="pengajar">Pengajar</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Ingat saya</label>
+                    </div>
+
+                    <div>
+                        <button type="submit">Masuk</button>
+                    </div>
+                </fieldset>
+            </form>
+
+            <p>Belum punya akun? Silakan hubungi admin untuk pendaftaran.</p>
+            <p><a href="index.html">Kembali ke Beranda</a></p>
+        </section>
+    </main>
+
+    <footer>
+    </footer>
+</body>
+</html>
