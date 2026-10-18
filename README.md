@@ -29,3 +29,5 @@ Screenshot sebelum dan sesudah interaksi tersimpan di folder docs/screenshots/:
 - 5-setelah-hapus-tugas.png: Tampilan setelah salah satu tugas dihapus dari tabel.
 - 6-toggle-materi.png: Tampilan efek toggle materi pada halaman detail kursus.
 
+## Video
+Ada di docs/
