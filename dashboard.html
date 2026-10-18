@@ -39,6 +39,50 @@
 
         <section id="tugas-mendatang">
             <h2>Tugas Mendatang</h2>
+            <div id="notif-box" style="display: none; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 10px; border-radius: 4px;"></div>
+            <div style="margin-bottom: 15px;">
+                <button type="button" id="btn-toggle-tambah">+ Tambah Tugas</button>
+                <label for="filter-status" style="display: inline; margin-left: 10px; margin-right: 5px;">Filter Status:</label>
+                <select id="filter-status" style="width: auto; display: inline-block;">
+                    <option value="Semua">Semua</option>
+                    <option value="Belum Dikerjakan">Belum Dikerjakan</option>
+                    <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+                    <option value="Selesai">Selesai</option>
+                </select>
+            </div>
+
+            <div id="box-form-tambah" style="display: none; margin-bottom: 15px; border: 1px solid #bdc3c7; padding: 15px; border-radius: 5px; background: #fafafa;">
+                <h3>Tambah Tugas Baru</h3>
+                <form id="form-tambah-tugas">
+                    <div>
+                        <label for="input-kursus">Kursus</label>
+                        <input type="text" id="input-kursus" placeholder="Nama kursus">
+                    </div>
+                    <div>
+                        <label for="input-nama-tugas">Nama Tugas</label>
+                        <input type="text" id="input-nama-tugas" placeholder="Nama tugas">
+                    </div>
+                    <div>
+                        <label for="input-deadline">Batas Waktu</label>
+                        <input type="text" id="input-deadline" placeholder="Contoh: 20 Oktober 2026">
+                    </div>
+                    <div>
+                        <label for="input-status">Status</label>
+                        <select id="input-status">
+                            <option value="Belum Dikerjakan">Belum Dikerjakan</option>
+                            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
+                            <option value="Selesai">Selesai</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit">Simpan</button>
+                        <button type="button" id="btn-batal-tambah">Batal</button>
+                    </div>
+                </form>
+            </div>
+
+            <p id="info-tugas-ringkasan" style="font-weight: bold; margin-bottom: 10px;"></p>
+
             <table border="1">
                 <caption>Daftar tugas yang akan datang</caption>
                 <thead>
@@ -47,21 +91,10 @@
                         <th scope="col">Nama Tugas</th>
                         <th scope="col">Batas Waktu</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Pemrograman Web</td>
-                        <td>Tugas 2: Form HTML dan Validasi</td>
-                        <td>30 September 2026</td>
-                        <td>Belum Dikerjakan</td>
-                    </tr>
-                    <tr>
-                        <td>Pemrograman Mobile</td>
-                        <td>Tugas 1: Desain Antarmuka Mobile</td>
-                        <td>5 Oktober 2026</td>
-                        <td>Sedang Dikerjakan</td>
-                    </tr>
+                <tbody id="tabel-tugas">
                 </tbody>
             </table>
         </section>
@@ -127,5 +160,7 @@
 
     <footer>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
