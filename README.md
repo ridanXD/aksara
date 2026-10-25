@@ -1,31 +1,38 @@
-# Aksara - LMS (Tugas BAB 5 Javascript dan Jquery)
+# Aksara - Manajemen Tugas (Tugas BAB 6 React Dasar)
 
-Aplikasi web Learning Management System (LMS) Aksara dengan interaktivitas client-side menggunakan JavaScript dan jQuery.
+Aplikasi frontend manajemen tugas kuliah berbasis React dan Vite. Project ini merupakan kerangka awal aplikasi fullstack yang akan dikembangkan hingga Pekan 14.
 
-## Fitur Interaktif (JavaScript & jQuery)
+## Entitas Data Utama
+- **Entitas:** Tugas
+- **Atribut:**
+  - `id`: Identifier unik tugas
+  - `judul`: Judul / nama tugas
+  - `mataKuliah`: Nama mata kuliah
+  - `deadline`: Batas waktu pengumpulan
+  - `status`: Status pengerjaan (Belum Selesai, Sedang Dikerjakan, Selesai)
 
-1. JavaScript Murni:
-- Menyimpan data dummy daftar tugas menggunakan array of object.
-- Fungsi menghitung jumlah tugas yang belum selesai.
-- Fungsi filter data tugas berdasarkan status.
-- Perulangan dan percabangan untuk me-render daftar tugas ke tabel secara dinamis beserta pewarnaan status.
+## Struktur Komponen (src/components/)
+1. `Header.jsx`: Komponen header dan judul aplikasi.
+2. `RingkasanTugas.jsx`: Komponen ringkasan total tugas, tugas belum selesai, dan tugas selesai.
+3. `FormTugas.jsx`: Komponen controlled form untuk menambahkan data tugas baru.
+4. `DaftarTugas.jsx`: Komponen untuk menampilkan daftar tugas dan menangani conditional rendering ketika data kosong.
+5. `KartuTugas.jsx`: Komponen kartu untuk menampilkan detail setiap item tugas beserta tombol hapus.
+6. `Footer.jsx`: Komponen footer aplikasi.
 
-2. jQuery:
-- Efek animasi slideToggle dan slideUp untuk menampilkan dan menyembunyikan form tambah tugas.
-- Efek animasi slideDown dan slideUp untuk notifikasi pesan berhasil.
-- Efek animasi slideToggle untuk menampilkan/menyembunyikan materi pada halaman detail kursus.
-- Event handling on('submit') pada form tambah tugas disertai validasi field kosong.
-- Event handling on('click') untuk menghapus data tugas dari tabel.
-- Event handling on('change') pada dropdown filter untuk menyaring data tugas.
-- Event handling on('submit') pada form login dan form pengumpulan tugas dengan validasi input.
+## Fitur Interaktivitas
+- State array di `App.jsx` untuk menyimpan daftar tugas.
+- Render list menggunakan `.map()` dengan key unik pada setiap item.
+- Controlled component pada form input dengan tombol Tambah.
+- Conditional rendering menampilkan teks "Belum ada data tugas" saat daftar kosong.
+- Tombol hapus pada tiap kartu tugas untuk menghapus data.
 
-## Dokumentasi Screenshot Interaksi
-
-Screenshot sebelum dan sesudah interaksi tersimpan di folder docs/screenshots/:
-- 1-sebelum-interaksi.png: Tampilan awal tabel tugas hasil render dinamis JavaScript.
-- 2-form-tambah-terbuka.png: Tampilan saat form tambah tugas dibuka (efek slideToggle).
-- 3-setelah-tambah-tugas.png: Tampilan setelah data tugas baru berhasil ditambahkan dan notifikasi muncul.
-- 4-filter-status.png: Tampilan setelah data difilter berdasarkan status.
-- 5-setelah-hapus-tugas.png: Tampilan setelah salah satu tugas dihapus dari tabel.
-- 6-toggle-materi.png: Tampilan efek toggle materi pada halaman detail kursus.
-
+## Cara Menjalankan
+1. Install dependensi:
+   ```bash
+   npm install
+   ```
+2. Jalankan server development:
+   ```bash
+   npm run dev
+   ```
+3. Buka browser pada alamat `http://localhost:5173`.
