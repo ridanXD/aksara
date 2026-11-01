@@ -4,6 +4,7 @@ import KursusSaatIni from './components/KursusSaatIni.jsx'
 import DaftarTugas from './components/DaftarTugas.jsx'
 import RingkasanKehadiran from './components/RingkasanKehadiran.jsx'
 import NilaiTerbaru from './components/NilaiTerbaru.jsx'
+import KutipanMotivasi from './components/KutipanMotivasi.jsx'
 import Footer from './components/Footer.jsx'
 import './App.css'
 
@@ -65,6 +66,7 @@ function App() {
         />
         <RingkasanKehadiran />
         <NilaiTerbaru />
+        <KutipanMotivasi />
       </main>
       <Footer />
     </div>
