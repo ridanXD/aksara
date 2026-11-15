@@ -1,0 +1,72 @@
+GET http://localhost:3000/tugas
+
+###
+
+GET http://localhost:3000/tugas/1
+
+###
+
+GET http://localhost:3000/tugas/999
+
+###
+
+POST http://localhost:3000/tugas
+Content-Type: application/json
+
+{
+  "judul": "Praktikum 4: Dependency Injection",
+  "mataKuliah": "Arsitektur Piranti Lunak",
+  "deadline": "2026-11-20",
+  "status": "Belum Dikerjakan",
+  "prioritas": "Tinggi",
+  "estimasiJam": 5,
+  "sudahSelesai": false
+}
+
+###
+
+POST http://localhost:3000/tugas
+Content-Type: application/json
+
+{
+  "judul": "Praktikum 4: Dependency Injection",
+  "mataKuliah": "Arsitektur Piranti Lunak",
+  "deadline": "2026-11-20"
+}
+
+###
+
+POST http://localhost:3000/tugas
+Content-Type: application/json
+
+{
+  "judul": "A",
+  "mataKuliah": "Web"
+}
+
+###
+
+PATCH http://localhost:3000/tugas/1
+Content-Type: application/json
+
+{
+  "status": "Sedang Dikerjakan",
+  "prioritas": "Tinggi"
+}
+
+###
+
+PATCH http://localhost:3000/tugas/999
+Content-Type: application/json
+
+{
+  "status": "Selesai"
+}
+
+###
+
+DELETE http://localhost:3000/tugas/1
+
+###
+
+DELETE http://localhost:3000/tugas/999

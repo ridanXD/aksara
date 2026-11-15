@@ -1,65 +1,82 @@
-# Aksara - Manajemen Tugas (Tugas BAB 7 Ajax dan Konsumsi API)
+# Aksara - Backend NestJS & Integrasi Fullstack (Tugas BAB 9)
 
-Aplikasi frontend manajemen tugas kuliah berbasis React dan Vite. Project ini merupakan kerangka awal aplikasi fullstack yang akan dikembangkan hingga Pekan 14.
+Aplikasi manajemen tugas kuliah fullstack dengan arsitektur MVC menggunakan NestJS di sisi backend dan React + Vite di sisi frontend.
 
-## Entitas Data Utama
-- **Entitas:** Tugas
-- **Atribut:**
-  - `id`: Identifier unik tugas
-  - `judul`: Judul / nama tugas
-  - `mataKuliah`: Nama mata kuliah
-  - `deadline`: Batas waktu pengumpulan
-  - `status`: Status pengerjaan (Belum Selesai, Sedang Dikerjakan, Selesai)
+## 1. Data Utama Aplikasi
+- **Entitas:** `Tugas`
+- **Field & Tipe Data:**
+  - `id` (number): Identifikasi unik tugas
+  - `judul` (string): Nama atau judul tugas (minimal 3 karakter)
+  - `mataKuliah` (string): Nama mata kuliah terkait (minimal 3 karakter)
+  - `deadline` (string): Tanggal batas waktu pengumpulan
+  - `status` (string): Status pengerjaan (`Belum Dikerjakan`, `Sedang Dikerjakan`, `Selesai`)
+  - `prioritas` (string): Tingkat prioritas (`Rendah`, `Sedang`, `Tinggi`)
+  - `estimasiJam` (number): Estimasi durasi pengerjaan dalam jam
+  - `sudahSelesai` (boolean): Flag penanda tugas selesai
 
-## Struktur Komponen (src/components/)
-1. `Header.jsx`: Komponen header dan judul aplikasi.
-2. `RingkasanTugas.jsx`: Komponen ringkasan total tugas, tugas belum selesai, dan tugas selesai.
-3. `FormTugas.jsx`: Komponen controlled form untuk menambahkan data tugas baru.
-4. `DaftarTugas.jsx`: Komponen untuk menampilkan daftar tugas dan menangani conditional rendering ketika data kosong.
-5. `KartuTugas.jsx`: Komponen kartu untuk menampilkan detail setiap item tugas beserta tombol hapus.
-6. `Footer.jsx`: Komponen footer aplikasi.
+## 2. Struktur MVC Backend (NestJS)
+- **Model / Entity (`backend/src/tugas/entities/tugas.entity.ts`):** Merepresentasikan struktur data tugas.
+- **Service (`backend/src/tugas/tugas.service.ts`):** Mengelola logika bisnis dan operasi CRUD yang disimpan dalam array memori:
+  - `create(createTugasDto)`
+  - `findAll()`
+  - `findOne(id)`
+  - `update(id, updateTugasDto)`
+  - `remove(id)`
+- **Controller (`backend/src/tugas/tugas.controller.ts`):** Menangani routing HTTP (`GET`, `POST`, `PATCH`, `DELETE`) dan memanggil service melalui dependency injection.
+- **DTO & Validasi (`backend/src/tugas/dto/`):**
+  - `CreateTugasDto`: Menggunakan `class-validator` (`@IsString`, `@IsNotEmpty`, `@MinLength`, `@IsIn`, `@IsInt`, `@Min`, `@IsBoolean`, `@IsOptional`).
+  - `UpdateTugasDto`: Menggunakan `PartialType(CreateTugasDto)`.
+  - `ValidationPipe`: Diaktifkan secara global di `backend/src/main.ts` dengan opsi `whitelist`, `forbidNonWhitelisted`, dan `transform`.
 
-## Fitur Interaktivitas
-- State array di `App.jsx` untuk menyimpan daftar tugas.
-- Render list menggunakan `.map()` dengan key unik pada setiap item.
-- Controlled component pada form input dengan tombol Tambah.
-- Conditional rendering menampilkan teks "Belum ada data tugas" saat daftar kosong.
-- Tombol hapus pada tiap kartu tugas untuk menghapus data.
+## 3. Penanganan Error (Exception NestJS)
+1. **`ConflictException` (HTTP 409):** Dilempar ketika menambahkan tugas dengan judul yang sama pada mata kuliah yang sama.
+2. **`NotFoundException` (HTTP 404):** Dilempar saat pencarian, pembaruan, atau penghapusan data dengan ID yang tidak ditemukan.
 
-## Fitur BAB 7: Ajax dan Konsumsi API Eksternal
+## 4. Pengujian REST Client
+File pengujian: `backend/tugas.http`.
 
-### Endpoint API yang Dipakai
+| No | Endpoint | Method | Keterangan | Status Code | Screenshot |
+|---|---|---|---|---|---|
+| 1 | `/tugas` | GET | Mengambil seluruh data tugas | 200 OK | ![GET All](docs/screenshots/week9/01-rest-client-get-all.png) |
+| 2 | `/tugas/1` | GET | Mengambil data tugas spesifik | 200 OK | ![GET by ID](docs/screenshots/week9/02-rest-client-get-by-id.png) |
+| 3 | `/tugas` | POST | Menambahkan data tugas baru | 201 Created | ![POST Create](docs/screenshots/week9/03-rest-client-post-create.png) |
+| 4 | `/tugas` | POST | Error duplikasi data (ConflictException) | 409 Conflict | ![POST Duplicate](docs/screenshots/week9/04-rest-client-conflict-exception.png) |
+| 5 | `/tugas` | POST | Error validasi class-validator | 400 Bad Request | ![POST Validation](docs/screenshots/week9/05-rest-client-validation-error.png) |
+| 6 | `/tugas/999` | GET | Error ID tidak ditemukan (NotFoundException) | 404 Not Found | ![GET Not Found](docs/screenshots/week9/06-rest-client-get-not-found.png) |
+| 7 | `/tugas/4` | PATCH | Memperbarui status / data tugas | 200 OK | ![PATCH Update](docs/screenshots/week9/07-rest-client-patch-update.png) |
+| 8 | `/tugas/4` | DELETE | Menghapus data tugas | 200 OK | ![DELETE](docs/screenshots/week9/08-rest-client-delete.png) |
 
-Menggunakan **DummyJSON Quotes API** (`https://dummyjson.com/quotes`):
-- `GET /quotes?limit=5` — mengambil 5 kutipan motivasi
-- `POST /quotes/add` — mengirim kutipan baru (mock, data tidak tersimpan permanen)
+## 5. Integrasi Frontend - Backend
+Alur CRUD penuh terhubung antara frontend React dan backend NestJS:
 
-API ini dipilih karena cocok dengan tema LMS — kutipan motivasi belajar untuk mahasiswa. DummyJSON gratis, tanpa registrasi, dan mendukung CORS.
+1. **Tampilan Awal (GET):** Data tugas dimuat langsung dari endpoint `GET /tugas` pada backend.
+   ![Frontend Awal](docs/screenshots/week9/09-frontend-tampilan-awal.png)
 
-### Komponen Baru: `KutipanMotivasi.jsx`
+2. **Buka Form Tambah Tugas:** Menampilkan input form penambahan tugas.
+   ![Frontend Form](docs/screenshots/week9/10-frontend-form-tambah.png)
 
-Komponen ini menangani seluruh siklus AJAX:
+3. **Menambah Data (POST):** Data dikirim melalui method POST ke backend dan daftar tabel diperbarui.
+   ![Frontend Tambah](docs/screenshots/week9/11-frontend-setelah-tambah.png)
 
-- **State `loading`** (boolean): saat `true`, menampilkan teks "Memuat kutipan..." sebagai indikator loading
-- **State `error`** (string/null): saat terisi, menampilkan pesan error beserta tombol **"Coba Lagi"** untuk mengulang `fetch()`
-- **State `kutipan`** (array): saat data berhasil diambil, di-render sebagai list menggunakan `.map()` dengan `item.id` sebagai key unik
-- **Fungsi `ambilKutipan()`**: menjalankan `fetch()` ke endpoint GET, mengatur ketiga state di atas sesuai hasil
-- **Fungsi `handleSubmitKutipan()`**: mengirim data kutipan baru via `fetch()` dengan method POST ke `/quotes/add`, hasilnya ditambahkan ke daftar yang ditampilkan
+4. **Mengubah Data (PATCH):** Mengubah status tugas melalui method PATCH ke backend.
+   ![Frontend Ubah Status](docs/screenshots/week9/12-frontend-setelah-ubah-status.png)
 
-### Pola Loading/Error
-
-1. Saat komponen pertama kali di-mount, `useEffect` memanggil `ambilKutipan()` yang mengeset `loading = true`
-2. Jika `fetch()` berhasil → `loading = false`, data masuk ke state `kutipan`, UI menampilkan daftar kutipan
-3. Jika `fetch()` gagal (network error / status bukan 2xx) → `loading = false`, `error` diisi pesan, UI menampilkan pesan error + tombol "Coba Lagi"
-4. Tombol "Coba Lagi" memanggil `ambilKutipan()` lagi dari awal
+5. **Menghapus Data (DELETE):** Menghapus data tugas melalui method DELETE ke backend.
+   ![Frontend Hapus](docs/screenshots/week9/13-frontend-setelah-hapus.png)
 
 ## Cara Menjalankan
-1. Install dependensi:
-   ```bash
-   npm install
-   ```
-2. Jalankan server development:
-   ```bash
-   npm run dev
-   ```
-3. Buka browser pada alamat `http://localhost:5173`.
+
+### Backend (NestJS)
+```bash
+cd backend
+npm install
+npm run start:dev
+```
+Backend berjalan pada `http://localhost:3000`.
+
+### Frontend (React + Vite)
+```bash
+npm install
+npm run dev
+```
+Frontend berjalan pada `http://localhost:5173`.

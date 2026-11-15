@@ -5,20 +5,23 @@ function FormTugas({ onTambahTugas, onBatal }) {
   const [nama, setNama] = useState('')
   const [deadline, setDeadline] = useState('')
   const [status, setStatus] = useState('Belum Dikerjakan')
+  const [prioritas, setPrioritas] = useState('Sedang')
+  const [estimasiJam, setEstimasiJam] = useState(2)
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!kursus.trim() || !nama.trim() || !deadline.trim()) {
-      alert('Semua field harus diisi!')
+      alert('Semua field wajib harus diisi!')
       return
     }
 
     const tugasBaru = {
-      id: Date.now(),
-      kursus: kursus.trim(),
-      nama: nama.trim(),
+      judul: nama.trim(),
+      mataKuliah: kursus.trim(),
       deadline: deadline.trim(),
-      status: status
+      status: status,
+      prioritas: prioritas,
+      estimasiJam: Number(estimasiJam) || 2
     }
 
     onTambahTugas(tugasBaru)
@@ -26,6 +29,8 @@ function FormTugas({ onTambahTugas, onBatal }) {
     setNama('')
     setDeadline('')
     setStatus('Belum Dikerjakan')
+    setPrioritas('Sedang')
+    setEstimasiJam(2)
   }
 
   return (
@@ -42,21 +47,21 @@ function FormTugas({ onTambahTugas, onBatal }) {
       <h3>Tambah Tugas Baru</h3>
       <form id="form-tambah-tugas" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="input-kursus">Kursus</label>
+          <label htmlFor="input-kursus">Mata Kuliah / Kursus</label>
           <input
             type="text"
             id="input-kursus"
-            placeholder="Nama kursus"
+            placeholder="Nama mata kuliah"
             value={kursus}
             onChange={(e) => setKursus(e.target.value)}
           />
         </div>
         <div>
-          <label htmlFor="input-nama-tugas">Nama Tugas</label>
+          <label htmlFor="input-nama-tugas">Nama / Judul Tugas</label>
           <input
             type="text"
             id="input-nama-tugas"
-            placeholder="Nama tugas"
+            placeholder="Judul tugas"
             value={nama}
             onChange={(e) => setNama(e.target.value)}
           />
@@ -66,7 +71,7 @@ function FormTugas({ onTambahTugas, onBatal }) {
           <input
             type="text"
             id="input-deadline"
-            placeholder="Contoh: 20 Oktober 2026"
+            placeholder="Contoh: 2026-11-20"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
           />
@@ -81,6 +86,18 @@ function FormTugas({ onTambahTugas, onBatal }) {
             <option value="Belum Dikerjakan">Belum Dikerjakan</option>
             <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
             <option value="Selesai">Selesai</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="input-prioritas">Prioritas</label>
+          <select
+            id="input-prioritas"
+            value={prioritas}
+            onChange={(e) => setPrioritas(e.target.value)}
+          >
+            <option value="Rendah">Rendah</option>
+            <option value="Sedang">Sedang</option>
+            <option value="Tinggi">Tinggi</option>
           </select>
         </div>
         <div>

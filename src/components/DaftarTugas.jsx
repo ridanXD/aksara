@@ -3,7 +3,7 @@ import BarisTugas from './BarisTugas.jsx'
 import FormTugas from './FormTugas.jsx'
 import RingkasanTugas from './RingkasanTugas.jsx'
 
-function DaftarTugas({ dataTugas, onTambahTugas, onHapusTugas, notif }) {
+function DaftarTugas({ dataTugas, onTambahTugas, onHapusTugas, onUbahStatus, notif }) {
   const [showForm, setShowForm] = useState(false)
   const [filterStatus, setFilterStatus] = useState('Semua')
 
@@ -93,7 +93,12 @@ function DaftarTugas({ dataTugas, onTambahTugas, onHapusTugas, notif }) {
             </tr>
           ) : (
             tugasTerfilter.map((tugas) => (
-              <BarisTugas key={tugas.id} tugas={tugas} onHapus={onHapusTugas} />
+              <BarisTugas
+                key={tugas.id}
+                tugas={tugas}
+                onHapus={onHapusTugas}
+                onUbahStatus={onUbahStatus}
+              />
             ))
           )}
         </tbody>
