@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tugas {
+  id           Int      @id @default(autoincrement())
+  judul        String
+  mataKuliah   String
+  deadline     String
+  status       String   @default("Belum Dikerjakan")
+  prioritas    String   @default("Sedang")
+  estimasiJam  Int      @default(2)
+  sudahSelesai Boolean  @default(false)
+
+  @@map("tugas")
+}

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { TugasService } from './tugas.service.js';
 import { CreateTugasDto } from './dto/create-tugas.dto.js';
@@ -21,9 +22,14 @@ export class TugasController {
     return this.tugasService.create(createTugasDto);
   }
 
+  @Get('statistik')
+  getStatistik() {
+    return this.tugasService.getStatistik();
+  }
+
   @Get()
-  findAll() {
-    return this.tugasService.findAll();
+  findAll(@Query('status') status?: string) {
+    return this.tugasService.findAll(status);
   }
 
   @Get(':id')

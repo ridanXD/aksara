@@ -6,6 +6,14 @@ GET http://localhost:3000/tugas/1
 
 ###
 
+GET http://localhost:3000/tugas/statistik
+
+###
+
+GET http://localhost:3000/tugas?status=Belum%20Dikerjakan
+
+###
+
 GET http://localhost:3000/tugas/999
 
 ###

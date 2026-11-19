@@ -1,51 +1,20 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../prisma.service.js';
 import { CreateTugasDto } from './dto/create-tugas.dto.js';
 import { UpdateTugasDto } from './dto/update-tugas.dto.js';
 import { Tugas } from './entities/tugas.entity.js';
 
 @Injectable()
 export class TugasService {
-  private tugasList: Tugas[] = [
-    {
-      id: 1,
-      judul: 'Tugas 2: Form HTML dan Validasi',
-      mataKuliah: 'Pemrograman Web',
-      deadline: '2026-10-30',
-      status: 'Belum Dikerjakan',
-      prioritas: 'Tinggi',
-      estimasiJam: 4,
-      sudahSelesai: false,
-    },
-    {
-      id: 2,
-      judul: 'Tugas 1: Desain Antarmuka Mobile',
-      mataKuliah: 'Pemrograman Mobile',
-      deadline: '2026-11-05',
-      status: 'Sedang Dikerjakan',
-      prioritas: 'Sedang',
-      estimasiJam: 6,
-      sudahSelesai: false,
-    },
-    {
-      id: 3,
-      judul: 'Tugas 3: ERD dan Normalisasi',
-      mataKuliah: 'Basis Data',
-      deadline: '2026-11-12',
-      status: 'Belum Dikerjakan',
-      prioritas: 'Rendah',
-      estimasiJam: 3,
-      sudahSelesai: false,
-    },
-  ];
+  constructor(private readonly prisma: PrismaService) {}
 
-  private nextId = 4;
-
-  create(createTugasDto: CreateTugasDto): Tugas {
-    const isDuplicate = this.tugasList.some(
-      (t) =>
-        t.judul.toLowerCase() === createTugasDto.judul.trim().toLowerCase() &&
-        t.mataKuliah.toLowerCase() === createTugasDto.mataKuliah.trim().toLowerCase(),
-    );
+  async create(createTugasDto: CreateTugasDto): Promise<Tugas> {
+    const isDuplicate = await this.prisma.tugas.findFirst({
+      where: {
+        judul: { equals: createTugasDto.judul.trim(), mode: 'insensitive' },
+        mataKuliah: { equals: createTugasDto.mataKuliah.trim(), mode: 'insensitive' },
+      },
+    });
 
     if (isDuplicate) {
       throw new ConflictException(
@@ -53,52 +22,65 @@ export class TugasService {
       );
     }
 
-    const baru: Tugas = {
-      id: this.nextId++,
-      judul: createTugasDto.judul.trim(),
-      mataKuliah: createTugasDto.mataKuliah.trim(),
-      deadline: createTugasDto.deadline.trim(),
-      status: createTugasDto.status || 'Belum Dikerjakan',
-      prioritas: createTugasDto.prioritas || 'Sedang',
-      estimasiJam: createTugasDto.estimasiJam ?? 2,
-      sudahSelesai:
-        createTugasDto.sudahSelesai !== undefined
-          ? createTugasDto.sudahSelesai
-          : createTugasDto.status === 'Selesai',
-    };
+    const status = createTugasDto.status || 'Belum Dikerjakan';
+    const sudahSelesai =
+      createTugasDto.sudahSelesai !== undefined
+        ? createTugasDto.sudahSelesai
+        : status === 'Selesai';
 
-    this.tugasList.push(baru);
-    return baru;
+    return this.prisma.tugas.create({
+      data: {
+        judul: createTugasDto.judul.trim(),
+        mataKuliah: createTugasDto.mataKuliah.trim(),
+        deadline: createTugasDto.deadline.trim(),
+        status,
+        prioritas: createTugasDto.prioritas || 'Sedang',
+        estimasiJam: createTugasDto.estimasiJam ?? 2,
+        sudahSelesai,
+      },
+    });
   }
 
-  findAll(): Tugas[] {
-    return this.tugasList;
+  async findAll(status?: string): Promise<Tugas[]> {
+    if (status) {
+      return this.prisma.tugas.findMany({
+        where: { status },
+        orderBy: { id: 'asc' },
+      });
+    }
+    return this.prisma.tugas.findMany({
+      orderBy: { id: 'asc' },
+    });
   }
 
-  findOne(id: number): Tugas {
-    const tugas = this.tugasList.find((t) => t.id === id);
+  async findOne(id: number): Promise<Tugas> {
+    const tugas = await this.prisma.tugas.findUnique({
+      where: { id },
+    });
     if (!tugas) {
       throw new NotFoundException(`Tugas dengan ID ${id} tidak ditemukan`);
     }
     return tugas;
   }
 
-  update(id: number, updateTugasDto: UpdateTugasDto): Tugas {
-    const index = this.tugasList.findIndex((t) => t.id === id);
-    if (index === -1) {
+  async update(id: number, updateTugasDto: UpdateTugasDto): Promise<Tugas> {
+    const current = await this.prisma.tugas.findUnique({
+      where: { id },
+    });
+    if (!current) {
       throw new NotFoundException(`Tugas dengan ID ${id} tidak ditemukan`);
     }
 
-    const current = this.tugasList[index];
     const targetJudul = updateTugasDto.judul ? updateTugasDto.judul.trim() : current.judul;
     const targetMataKuliah = updateTugasDto.mataKuliah ? updateTugasDto.mataKuliah.trim() : current.mataKuliah;
 
-    const isDuplicate = this.tugasList.some(
-      (t) =>
-        t.id !== id &&
-        t.judul.toLowerCase() === targetJudul.toLowerCase() &&
-        t.mataKuliah.toLowerCase() === targetMataKuliah.toLowerCase(),
-    );
+    const isDuplicate = await this.prisma.tugas.findFirst({
+      where: {
+        id: { not: id },
+        judul: { equals: targetJudul, mode: 'insensitive' },
+        mataKuliah: { equals: targetMataKuliah, mode: 'insensitive' },
+      },
+    });
 
     if (isDuplicate) {
       throw new ConflictException(
@@ -112,29 +94,55 @@ export class TugasService {
         ? updateTugasDto.sudahSelesai
         : newStatus === 'Selesai';
 
-    const updated: Tugas = {
-      ...current,
-      ...updateTugasDto,
-      judul: targetJudul,
-      mataKuliah: targetMataKuliah,
-      status: newStatus,
-      sudahSelesai: newSudahSelesai,
-    };
-
-    this.tugasList[index] = updated;
-    return updated;
+    return this.prisma.tugas.update({
+      where: { id },
+      data: {
+        ...(updateTugasDto.judul !== undefined && { judul: targetJudul }),
+        ...(updateTugasDto.mataKuliah !== undefined && { mataKuliah: targetMataKuliah }),
+        ...(updateTugasDto.deadline !== undefined && { deadline: updateTugasDto.deadline.trim() }),
+        ...(updateTugasDto.status !== undefined && { status: newStatus }),
+        ...(updateTugasDto.prioritas !== undefined && { prioritas: updateTugasDto.prioritas }),
+        ...(updateTugasDto.estimasiJam !== undefined && { estimasiJam: updateTugasDto.estimasiJam }),
+        sudahSelesai: newSudahSelesai,
+      },
+    });
   }
 
-  remove(id: number): { message: string; id: number } {
-    const index = this.tugasList.findIndex((t) => t.id === id);
-    if (index === -1) {
+  async remove(id: number): Promise<{ message: string; id: number }> {
+    const current = await this.prisma.tugas.findUnique({
+      where: { id },
+    });
+    if (!current) {
       throw new NotFoundException(`Tugas dengan ID ${id} tidak ditemukan`);
     }
 
-    this.tugasList.splice(index, 1);
+    await this.prisma.tugas.delete({
+      where: { id },
+    });
+
     return {
       message: `Tugas dengan ID ${id} berhasil dihapus`,
       id,
+    };
+  }
+
+  async getStatistik() {
+    const total = await this.prisma.tugas.count();
+    const selesai = await this.prisma.tugas.count({
+      where: { status: 'Selesai' },
+    });
+    const sedangDikerjakan = await this.prisma.tugas.count({
+      where: { status: 'Sedang Dikerjakan' },
+    });
+    const belumDikerjakan = await this.prisma.tugas.count({
+      where: { status: 'Belum Dikerjakan' },
+    });
+
+    return {
+      total,
+      selesai,
+      sedangDikerjakan,
+      belumDikerjakan,
     };
   }
 }

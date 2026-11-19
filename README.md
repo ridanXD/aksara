@@ -1,82 +1,141 @@
-# Aksara - Backend NestJS & Integrasi Fullstack (Tugas BAB 9)
+# Aksara - REST API + PostgreSQL + Prisma ORM (Tugas BAB 10)
 
-Aplikasi manajemen tugas kuliah fullstack dengan arsitektur MVC menggunakan NestJS di sisi backend dan React + Vite di sisi frontend.
+Aplikasi manajemen tugas kuliah fullstack dengan arsitektur MVC menggunakan NestJS di sisi backend, PostgreSQL sebagai sistem basis data relasional melalui Prisma ORM, dan React + Vite di sisi frontend.
 
-## 1. Data Utama Aplikasi
-- **Entitas:** `Tugas`
-- **Field & Tipe Data:**
-  - `id` (number): Identifikasi unik tugas
-  - `judul` (string): Nama atau judul tugas (minimal 3 karakter)
-  - `mataKuliah` (string): Nama mata kuliah terkait (minimal 3 karakter)
-  - `deadline` (string): Tanggal batas waktu pengumpulan
-  - `status` (string): Status pengerjaan (`Belum Dikerjakan`, `Sedang Dikerjakan`, `Selesai`)
-  - `prioritas` (string): Tingkat prioritas (`Rendah`, `Sedang`, `Tinggi`)
-  - `estimasiJam` (number): Estimasi durasi pengerjaan dalam jam
-  - `sudahSelesai` (boolean): Flag penanda tugas selesai
+---
 
-## 2. Struktur MVC Backend (NestJS)
-- **Model / Entity (`backend/src/tugas/entities/tugas.entity.ts`):** Merepresentasikan struktur data tugas.
-- **Service (`backend/src/tugas/tugas.service.ts`):** Mengelola logika bisnis dan operasi CRUD yang disimpan dalam array memori:
-  - `create(createTugasDto)`
-  - `findAll()`
-  - `findOne(id)`
-  - `update(id, updateTugasDto)`
-  - `remove(id)`
-- **Controller (`backend/src/tugas/tugas.controller.ts`):** Menangani routing HTTP (`GET`, `POST`, `PATCH`, `DELETE`) dan memanggil service melalui dependency injection.
-- **DTO & Validasi (`backend/src/tugas/dto/`):**
-  - `CreateTugasDto`: Menggunakan `class-validator` (`@IsString`, `@IsNotEmpty`, `@MinLength`, `@IsIn`, `@IsInt`, `@Min`, `@IsBoolean`, `@IsOptional`).
-  - `UpdateTugasDto`: Menggunakan `PartialType(CreateTugasDto)`.
-  - `ValidationPipe`: Diaktifkan secara global di `backend/src/main.ts` dengan opsi `whitelist`, `forbidNonWhitelisted`, dan `transform`.
+## 1. Entitas & Model Prisma
 
-## 3. Penanganan Error (Exception NestJS)
-1. **`ConflictException` (HTTP 409):** Dilempar ketika menambahkan tugas dengan judul yang sama pada mata kuliah yang sama.
-2. **`NotFoundException` (HTTP 404):** Dilempar saat pencarian, pembaruan, atau penghapusan data dengan ID yang tidak ditemukan.
+Model utama dirancang pada `backend/prisma/schema.prisma`:
 
-## 4. Pengujian REST Client
-File pengujian: `backend/tugas.http`.
+| Field | Tipe Data | Deskripsi | Default |
+|---|---|---|---|
+| `id` | Int | Identifier unik (Primary Key) | `autoincrement()` |
+| `judul` | String | Judul atau nama tugas | - |
+| `mataKuliah` | String | Nama mata kuliah terkait | - |
+| `deadline` | String | Batas waktu pengumpulan tugas | - |
+| `status` | String | Status pengerjaan tugas | `"Belum Dikerjakan"` |
+| `prioritas` | String | Tingkat prioritas tugas | `"Sedang"` |
+| `estimasiJam` | Int | Estimasi durasi pengerjaan (jam) | `2` |
+| `sudahSelesai` | Boolean | Indikator penyelesaian tugas | `false` |
 
-| No | Endpoint | Method | Keterangan | Status Code | Screenshot |
-|---|---|---|---|---|---|
-| 1 | `/tugas` | GET | Mengambil seluruh data tugas | 200 OK | ![GET All](docs/screenshots/week9/01-rest-client-get-all.png) |
-| 2 | `/tugas/1` | GET | Mengambil data tugas spesifik | 200 OK | ![GET by ID](docs/screenshots/week9/02-rest-client-get-by-id.png) |
-| 3 | `/tugas` | POST | Menambahkan data tugas baru | 201 Created | ![POST Create](docs/screenshots/week9/03-rest-client-post-create.png) |
-| 4 | `/tugas` | POST | Error duplikasi data (ConflictException) | 409 Conflict | ![POST Duplicate](docs/screenshots/week9/04-rest-client-conflict-exception.png) |
-| 5 | `/tugas` | POST | Error validasi class-validator | 400 Bad Request | ![POST Validation](docs/screenshots/week9/05-rest-client-validation-error.png) |
-| 6 | `/tugas/999` | GET | Error ID tidak ditemukan (NotFoundException) | 404 Not Found | ![GET Not Found](docs/screenshots/week9/06-rest-client-get-not-found.png) |
-| 7 | `/tugas/4` | PATCH | Memperbarui status / data tugas | 200 OK | ![PATCH Update](docs/screenshots/week9/07-rest-client-patch-update.png) |
-| 8 | `/tugas/4` | DELETE | Menghapus data tugas | 200 OK | ![DELETE](docs/screenshots/week9/08-rest-client-delete.png) |
+---
 
-## 5. Integrasi Frontend - Backend
-Alur CRUD penuh terhubung antara frontend React dan backend NestJS:
+## 2. Tahapan Implementasi & Dokumentasi Screenshot
 
-1. **Tampilan Awal (GET):** Data tugas dimuat langsung dari endpoint `GET /tugas` pada backend.
-   ![Frontend Awal](docs/screenshots/week9/09-frontend-tampilan-awal.png)
+### Tahap 1: Persiapan Server PostgreSQL & Basis Data
+Server PostgreSQL lokal disiapkan pada port `5432` dan basis data `aksara_db` berhasil dibuat.
 
-2. **Buka Form Tambah Tugas:** Menampilkan input form penambahan tugas.
-   ![Frontend Form](docs/screenshots/week9/10-frontend-form-tambah.png)
+![PostgreSQL Database](docs/screenshots/01-database-postgresql.png)
 
-3. **Menambah Data (POST):** Data dikirim melalui method POST ke backend dan daftar tabel diperbarui.
-   ![Frontend Tambah](docs/screenshots/week9/11-frontend-setelah-tambah.png)
+---
 
-4. **Mengubah Data (PATCH):** Mengubah status tugas melalui method PATCH ke backend.
-   ![Frontend Ubah Status](docs/screenshots/week9/12-frontend-setelah-ubah-status.png)
+### Tahap 2: Perancangan Model Prisma (`schema.prisma`)
+Model entitas `Tugas` didefinisikan pada `schema.prisma` yang dipetakan ke tabel relasional `tugas`.
 
-5. **Menghapus Data (DELETE):** Menghapus data tugas melalui method DELETE ke backend.
-   ![Frontend Hapus](docs/screenshots/week9/13-frontend-setelah-hapus.png)
+![Schema Prisma](docs/screenshots/02-schema-prisma.png)
 
-## Cara Menjalankan
+---
 
-### Backend (NestJS)
+### Tahap 3: Migrasi Basis Data (`npx prisma migrate dev`)
+Migrasi awal dijalankan untuk menerapkan skema ke PostgreSQL dan tabel `tugas` berhasil terbentuk.
+
+![Prisma Migrate](docs/screenshots/03-prisma-migrate-dev.png)
+
+---
+
+### Tahap 4: PrismaService Provider & Integrasi Service
+`PrismaService` dibuat sebagai injectable provider yang memperluas `PrismaClient` dan diintegrasikan ke `TugasService` menggantikan penyimpanan array memori.
+
+![PrismaService Provider](docs/screenshots/04-prisma-service-provider.png)
+
+---
+
+### Tahap 5: Pengujian Operasi CRUD Permanen
+
+#### a. GET All Tugas
+Mengambil seluruh data tugas yang tersimpan permanen di database PostgreSQL.
+
+![GET All](docs/screenshots/05-rest-get-all.png)
+
+#### b. GET Tugas by ID
+Mengambil data tugas spesifik berdasarkan parameter ID.
+
+![GET by ID](docs/screenshots/06-rest-get-by-id.png)
+
+#### c. POST Create Tugas
+Menambahkan data tugas baru ke database dengan status code `201 Created`.
+
+![POST Create](docs/screenshots/07-rest-post-create.png)
+
+#### d. POST Conflict Exception (Duplikasi Data)
+Validasi penolakan penambahan tugas duplikat dengan status code `409 Conflict`.
+
+![POST Conflict](docs/screenshots/08-rest-post-conflict.png)
+
+#### e. PATCH Update Tugas
+Memperbarui data dan status tugas di PostgreSQL dengan status code `200 OK`.
+
+![PATCH Update](docs/screenshots/09-rest-patch-update.png)
+
+#### f. DELETE Tugas
+Menghapus data tugas dari PostgreSQL dengan status code `200 OK`.
+
+![DELETE](docs/screenshots/10-rest-delete.png)
+
+---
+
+### Tahap 6: Query Lanjutan (Filter WHERE & Statistik COUNT)
+
+#### a. Filter Data (`WHERE` via Query Parameter)
+Endpoint: `GET /tugas?status=Belum%20Dikerjakan`  
+Memfilter daftar tugas menggunakan klausa `where` pada Prisma Client.
+
+![Filter Data](docs/screenshots/11-rest-query-filter.png)
+
+#### b. Statistik Sederhana (`COUNT` Aggregation)
+Endpoint: `GET /tugas/statistik`  
+Menghitung ringkasan jumlah tugas (total, selesai, sedang dikerjakan, belum dikerjakan) menggunakan `prisma.tugas.count()`.
+
+![Statistik](docs/screenshots/12-rest-query-statistik.png)
+
+---
+
+### Tahap 7: Tampilan Aplikasi Frontend
+
+#### Tampilan Desktop
+Tampilan antarmuka web pada layar desktop yang terhubung langsung dengan backend NestJS dan database PostgreSQL.
+
+![Frontend Desktop](docs/screenshots/13-frontend-desktop.png)
+
+#### Tampilan Mobile
+Tampilan antarmuka responsif pada perangkat mobile.
+
+![Frontend Mobile](docs/screenshots/14-frontend-mobile.png)
+
+---
+
+## 3. Cara Menjalankan Aplikasi
+
+### 1. Database (PostgreSQL)
+Pastikan service PostgreSQL aktif, lalu buat database:
+```bash
+psql -U postgres -c "CREATE DATABASE aksara_db;"
+```
+
+### 2. Backend (NestJS + Prisma)
 ```bash
 cd backend
 npm install
+npx prisma migrate dev
+npx prisma db seed
 npm run start:dev
 ```
-Backend berjalan pada `http://localhost:3000`.
+Backend berjalan pada: `http://localhost:3000`
 
-### Frontend (React + Vite)
+### 3. Frontend (React + Vite)
 ```bash
 npm install
 npm run dev
 ```
-Frontend berjalan pada `http://localhost:5173`.
+Frontend berjalan pada: `http://localhost:5173`
